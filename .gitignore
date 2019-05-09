@@ -102,3 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+Offline-01/SubstitutionCipherBreaker/\.vs/SubstitutionCipherBreaker/v16/\.suo
+
+Offline-01/SubstitutionCipherBreaker/SubstitutionCipherBreaker/\.idea/
