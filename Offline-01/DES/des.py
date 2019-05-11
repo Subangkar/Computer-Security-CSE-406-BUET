@@ -24,7 +24,7 @@ class Des:
 			block = bitutils.string_to_bit_array(block)
 			block = self.permute(block, data.PI)  # initial permutation on data
 			l, r = bitutils.nsplit(block, 32)  # l(LEFT), r(RIGHT)
-			for i in range(16):  # Do the 16 iterations
+			for i in range(16):  # 16 iterations
 				if action == ENCODE:
 					k = self.keys[i]
 				else:
@@ -48,11 +48,11 @@ class Des:
 		key_x64 = bitutils.string_to_bit_array(self.orig_key)
 		key_x56 = self.permute(key_x64, data.CP_1)  # x64 key to x56 key
 		left, right = bitutils.nsplit(key_x56, 28)  # l,r (x28)
-		for i in range(16):  # Apply the 16 rounds
+		for i in range(16):
 			left, right = self.shift(left, right, data.SHIFT[i])
 			ki_x56 = left + right
-			ki_x48 = self.permute(ki_x56, data.CP_2)
-			self.keys.append(ki_x48)  # Apply the permute in (x56) to get the Ki(x48)
+			ki_x48 = self.permute(ki_x56, data.CP_2)  # Apply the permute in (x56) to get the Ki(x48)
+			self.keys.append(ki_x48)
 
 	def permute(self, block, table):
 		return [block[x - 1] for x in table]
