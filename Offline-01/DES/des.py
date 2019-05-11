@@ -35,9 +35,12 @@ class Des:
 			result += self.permute(r + l, data.PI_1)  # last permute to append to result
 			self.text = bitutils.bit_array_to_string(result)
 
+	# f(R(i),K(i)) x48 into x32 using PI_2
+	# permute that x32 into x32 using P
 	def f(self, r, k):
 		e = self.expand(r, data.E)  # Expand R to match Ki size (x48)
-		return self.permute(bitutils.xor(k, e), data.P)  # (e ^ Ki)x48 into x32
+		f_x32 = self.permute(bitutils.xor(k, e), data.PI_2)  # (e ^ Ki)x48 into x32
+		return self.permute(f_x32, data.P)
 
 	# Initial x56 key and x48 key_i for each iterations
 	def generatekeys(self):
@@ -51,7 +54,7 @@ class Des:
 			ki_x48 = self.permute(ki_x56, data.CP_2)
 			self.keys.append(ki_x48)  # Apply the permute in (x56) to get the Ki(x48)
 
-	def permute(self, block, table):  # Permute the given block using the given table
+	def permute(self, block, table):
 		return [block[x - 1] for x in table]
 
 	def expand(self, block, table):
