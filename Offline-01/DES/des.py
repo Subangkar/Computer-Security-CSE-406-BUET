@@ -1,3 +1,5 @@
+import sys
+
 import bitutils
 import data
 
@@ -82,10 +84,17 @@ def removePadding(text, pad_len):  # Remove the padding of the plain text (it as
 
 
 if __name__ == '__main__':
-	key = "megabuck"
-	text = "Hello world"
+	sys.stdin = open("in.txt", "r")
+	# key = "megabuck"
+	# text = "Hello world"
 	# key = input("Enter Key: ")
 	# text = input("Enter Plain Text: ")
+
+	key = input()
+	text = input()
+	print("Enter Key: " + key)
+	print("Enter Plain Text: " + text)
+
 	plain_text, pad_len = addPadding(text)
 	d = Des()
 	cipher_text = d.encrypt(key, plain_text)
