@@ -1,35 +1,64 @@
+import sys
+
 import secondMostChar
 import re
 
 # ------------------ Data --------------------
 orig_value = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-# ------------------ INPUT --------------------
-cipher_text = "THQVHAQCYCSPMAWARNTLNRTAVQUOEQWWNPQRTZQEYAWARTHQTENARTHQTENARKALLONWWMFINOQWTNTCAXQINKRVEQNTQTHQNXNLNRVHQKHQRTHQTENARLQNXQWTHQWTNTAYR "
-clear_text = cipher_text
+cipher_text = ''
+freq_chars_str = ''
+freq_words_str = ''
 
-freq_chars = ['e', 't', 'a']
+# freq_chars = ['e', 't', 'a']
+freq_chars = []
 
-freq_words = ['atlantic', 'express', 'avalanche', 'station']
+# freq_words = ['atlantic', 'express', 'avalanche', 'station']
+freq_words = []
 
 freq_words_custom = [
 	'and'
 	# ,'ing'
-	,'will'
-	,'of'
+	, 'will'
+	, 'of'
 	# ,'be'
 	# ,'by'
-	,'passby'
+	, 'passby'
 	, 'dawn'
 ]
 
-# ------------------ Map & Update --------------------
 key_map = dict()
 key_found_list = dict()
-for i in range(26):
-	key_found_list[str(chr(i + ord('a')))] = False
-for char in orig_value:
-	key_map[char] = '\0'
+
+
+# ------------------ INPUT --------------------
+
+
+def fileinput():
+	global clear_text, cipher_text, freq_chars_str, freq_words_str, freq_words, freq_chars
+
+	cipher_text = input()
+	while freq_chars_str == '':
+		freq_chars_str = input()
+	while freq_words_str == '':
+		freq_words_str = input()
+
+	freq_words = freq_words_str.split(',')
+	freq_chars = freq_chars_str.split(',')
+
+	# cipher_text = "THQVHAQCYCSPMAWARNTLNRTAVQUOEQWWNPQRTZQEYAWARTHQTENARTHQTENARKALLONWWMFINOQWTNTCAXQINKRVEQNTQTHQNXNLNRVHQKHQRTHQTENARLQNXQWTHQWTNTAYR "
+	# freq_chars = ['e', 't', 'a']
+	# freq_words = ['atlantic', 'express', 'avalanche', 'station']
+	clear_text = cipher_text
+
+# ------------------ Map & Update --------------------
+
+def initmap():
+	global key_map, key_found_list, orig_value
+	for i in range(26):
+		key_found_list[str(chr(i + ord('a')))] = False
+	for char in orig_value:
+		key_map[char] = '\0'
 
 
 def updateMap(cipher, clear, key, key_found):
@@ -53,6 +82,7 @@ def updatedClearTextWithMap(clear, key):
 
 
 def printkey(key):
+	global orig_value
 	for c in orig_value:
 		print(c, end=" ")
 	print()
@@ -78,52 +108,68 @@ def string_to_regex(word, key_found_list):
 
 
 # ------------------ Most Freq Chars Replacement --------------------
-# print(clear_text)  # Cipher
+def replacefreqletters():
+	global key_map, key_found_list, clear_text, cipher_text, freq_words, freq_chars
 
-freq_count_list = (secondMostChar.char_count(cipher_text))
+	# print(clear_text)  # Cipher
 
-for i in range(freq_chars.__len__()):
-	key_map[freq_count_list[-i - 1][0]] = freq_chars[i]
-	key_found_list[freq_chars[i]] = True
-	clear_text = clear_text.replace(freq_count_list[-i - 1][0], key_map[freq_count_list[-i - 1][0]])
+	freq_count_list = (secondMostChar.char_count(cipher_text))
+
+	for i in range(freq_chars.__len__()):
+		key_map[freq_count_list[-i - 1][0]] = freq_chars[i]
+		key_found_list[freq_chars[i]] = True
+		clear_text = clear_text.replace(freq_count_list[-i - 1][0], key_map[freq_count_list[-i - 1][0]])
+
 
 # print(clear_text)  # frequent Replaced
+
 # ------------------ Word Replacement Provided --------------------
 
-# print(freq_pattern[freq_words[0]])
-for i in range(freq_words.__len__()):
-	print(freq_words[i], end=" ")
-	print(string_to_regex(freq_words[i], key_found_list))
-	s = re.sub(string_to_regex(freq_words[i], key_found_list), freq_words[i], clear_text)
-	# print(s)  # frequent Replaced
-	updateMap(clear_text, s, key_map, key_found_list)
-	clear_text = updatedClearTextWithMap(clear_text, key_map)
-# print(clear_text)  # word 1 replaced
+def replaceprovidedwords():
+	global key_map, key_found_list, clear_text, cipher_text, freq_words, freq_chars
 
-print("\n --------- From Provided Words Only ---------- ")
-print("Key: ")
-printkey(key_map)
-print("Cipher: " + cipher_text)
-print("Clear : " + clear_text)
+	# print(freq_pattern[freq_words[0]])
+	for i in range(freq_words.__len__()):
+		print(freq_words[i], end=" ")
+		print(string_to_regex(freq_words[i], key_found_list))
+		s = re.sub(string_to_regex(freq_words[i], key_found_list), freq_words[i], clear_text)
+		# print(s)  # frequent Replaced
+		updateMap(clear_text, s, key_map, key_found_list)
+		clear_text = updatedClearTextWithMap(clear_text, key_map)
+	# print(clear_text)  # word 1 replaced
+
+	print("\n --------- From Provided Words Only ---------- ")
+	print("Key: ")
+	printkey(key_map)
+	print("Cipher: " + cipher_text)
+	print("Clear : " + clear_text)
+
 
 # ------------------ Word Replacement Custom --------------------
+def replacecustomwords():
+	global key_map, key_found_list, clear_text, cipher_text, freq_words, freq_chars
 
-# print(freq_pattern[freq_words[0]])
-for i in range(freq_words_custom.__len__()):
-	print(freq_words_custom[i], end=" ")
-	print(string_to_regex(freq_words_custom[i], key_found_list))
-	s = re.sub(string_to_regex(freq_words_custom[i], key_found_list), freq_words_custom[i], clear_text)
-	# print(s)  # frequent Replaced
-	updateMap(clear_text, s, key_map, key_found_list)
-	clear_text = updatedClearTextWithMap(clear_text, key_map)
-# print(clear_text)  # word 1 replaced
+	# print(freq_pattern[freq_words[0]])
+	for i in range(freq_words_custom.__len__()):
+		print(freq_words_custom[i], end=" ")
+		print(string_to_regex(freq_words_custom[i], key_found_list))
+		s = re.sub(string_to_regex(freq_words_custom[i], key_found_list), freq_words_custom[i], clear_text)
+		# print(s)  # frequent Replaced
+		updateMap(clear_text, s, key_map, key_found_list)
+		clear_text = updatedClearTextWithMap(clear_text, key_map)
+	# print(clear_text)  # word 1 replaced
 
-print("\n --------- From Visible Intuition ---------- ")
-print("Key: ")
-printkey(key_map)
-print("Cipher: " + cipher_text)
-print("Clear : " + clear_text)
+	print("\n --------- From Visible Intuition ---------- ")
+	print("Key: ")
+	printkey(key_map)
+	print("Cipher: " + cipher_text)
+	print("Clear : " + clear_text)
 
-# # printkey(key_map)
-# # s = "helloworld"
-# # print(collections.Counter(s).most_common(1)[0])
+
+if __name__ == '__main__':
+	sys.stdin = open("substitution-15.txt", "r")
+	fileinput()
+	initmap()
+	replacefreqletters()
+	replaceprovidedwords()
+	replacecustomwords()
