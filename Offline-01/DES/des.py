@@ -51,7 +51,7 @@ class Des:
 			ki_x48 = self.permute(ki_x56, data.CP_2)
 			self.keys.append(ki_x48)  # Apply the permute in (x56) to get the Ki(x48)
 
-	def permute(self, block, table):  # Permute the given block using the given table (so generic method)
+	def permute(self, block, table):  # Permute the given block using the given table
 		return [block[x - 1] for x in table]
 
 	def expand(self, block, table):
@@ -92,8 +92,8 @@ if __name__ == '__main__':
 
 	key = input()
 	text = input()
-	print("Enter Key: " + key)
-	print("Enter Plain Text: " + text)
+	print("Enter Key        : %r" % key)
+	print("Enter Plain Text : %r" % text)
 
 	plain_text, pad_len = addPadding(text)
 	d = Des()
