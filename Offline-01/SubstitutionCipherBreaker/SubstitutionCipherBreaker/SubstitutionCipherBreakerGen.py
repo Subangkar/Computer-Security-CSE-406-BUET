@@ -16,16 +16,17 @@ freq_chars = []
 # freq_words = ['atlantic', 'express', 'avalanche', 'station']
 freq_words = []
 
-freq_words_custom = [
-	'and'
-	# ,'ing'
-	, 'will'
-	, 'of'
-	# ,'be'
-	# ,'by'
-	, 'passby'
-	, 'dawn'
-]
+# freq_words_custom = [
+# 	'and'
+# 	# ,'ing'
+# 	, 'will'
+# 	, 'of'
+# 	# ,'be'
+# 	# ,'by'
+# 	, 'passby'
+# 	, 'dawn'
+# ]
+freq_words_custom = []
 
 key_map = dict()
 key_found_list = dict()
@@ -35,21 +36,29 @@ key_found_list = dict()
 
 
 def fileinput():
-	global clear_text, cipher_text, freq_chars_str, freq_words_str, freq_words, freq_chars
+	global clear_text, cipher_text, freq_chars_str, freq_words_str, freq_words, freq_chars, freq_words_custom
 
 	cipher_text = input()
 	while freq_chars_str == '':
-		freq_chars_str = input()
+		freq_chars_str = input().strip()
 	while freq_words_str == '':
-		freq_words_str = input()
+		freq_words_str = input().strip()
 
-	freq_words = freq_words_str.split(',')
-	freq_chars = freq_chars_str.split(',')
+	freq_words = freq_words_str.split(', ')
+	freq_chars = freq_chars_str.split(', ')
 
 	# cipher_text = "THQVHAQCYCSPMAWARNTLNRTAVQUOEQWWNPQRTZQEYAWARTHQTENARTHQTENARKALLONWWMFINOQWTNTCAXQINKRVEQNTQTHQNXNLNRVHQKHQRTHQTENARLQNXQWTHQWTNTAYR "
 	# freq_chars = ['e', 't', 'a']
 	# freq_words = ['atlantic', 'express', 'avalanche', 'station']
+
 	clear_text = cipher_text
+	with open('words.db', 'r') as f:
+		for line in f:
+			for word in line.split():
+				if word == '#':
+					return
+				freq_words_custom.append(word)
+
 
 # ------------------ Map & Update --------------------
 
@@ -64,14 +73,14 @@ def initmap():
 def updateMap(cipher, clear, key, key_found):
 	for i in range(cipher.__len__()):
 		if cipher[i] != clear[i] and clear[i].islower():
-			if cipher[i].islower() or clear[i].isupper() or key[cipher[i]] != '\0':
-				print("redundant > ", end=" ")
-				print("cipher=" + cipher[i], end=" ")
-				print("clear=" + clear[i], end=" ")
-				print("key=" + key[cipher[i]], end="\n")
-			else:
+			if cipher[i].isupper() and clear[i].islower() and key[cipher[i]] == '\0':
 				key[cipher[i]] = clear[i]
 				key_found[clear[i]] = True
+	# else:
+	# 	print("redundant > ", end=" ")
+	# 	print("cipher=" + cipher[i], end=" ")
+	# 	print("clear=" + clear[i], end=" ")
+	# 	print("key=" + key[cipher[i]], end="\n")
 
 
 def updatedClearTextWithMap(clear, key):
@@ -130,7 +139,7 @@ def replaceprovidedwords():
 
 	# print(freq_pattern[freq_words[0]])
 	for i in range(freq_words.__len__()):
-		print(freq_words[i], end=" ")
+		print(freq_words[i], end=">>")
 		print(string_to_regex(freq_words[i], key_found_list))
 		s = re.sub(string_to_regex(freq_words[i], key_found_list), freq_words[i], clear_text)
 		# print(s)  # frequent Replaced
@@ -149,9 +158,12 @@ def replaceprovidedwords():
 def replacecustomwords():
 	global key_map, key_found_list, clear_text, cipher_text, freq_words, freq_chars
 
+	if len(freq_words_custom) == 0:
+		return
+
 	# print(freq_pattern[freq_words[0]])
 	for i in range(freq_words_custom.__len__()):
-		print(freq_words_custom[i], end=" ")
+		print(freq_words_custom[i], end=">>")
 		print(string_to_regex(freq_words_custom[i], key_found_list))
 		s = re.sub(string_to_regex(freq_words_custom[i], key_found_list), freq_words_custom[i], clear_text)
 		# print(s)  # frequent Replaced
@@ -167,7 +179,7 @@ def replacecustomwords():
 
 
 if __name__ == '__main__':
-	sys.stdin = open("substitution-15.txt", "r")
+	sys.stdin = open("in/substitution-15.txt", "r")
 	fileinput()
 	initmap()
 	replacefreqletters()
