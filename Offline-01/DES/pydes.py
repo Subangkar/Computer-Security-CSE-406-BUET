@@ -111,7 +111,6 @@ PI_1 = [40, 8, 48, 16, 56, 24, 64, 32,
 # Matrix that determine the shift for each round of keys
 SHIFT = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
 
-
 ENCRYPT = 1
 DECRYPT = 0
 
@@ -121,6 +120,7 @@ class des():
 		self.password = None
 		self.text = None
 		self.keys = list()
+		self.pad_len = 0
 
 	def run(self, key, text, action=ENCRYPT, padding=False):
 		if len(key) < 8:
@@ -136,7 +136,7 @@ class des():
 		elif len(self.text) % 8 != 0:  # If not padding specified data size must be multiple of 8 bytes
 			raise "Data size should be multiple of 8"
 
-		self.generatekeys()  # Generate all the keys
+		self.generatekeys()  # Generate all the keys for 16 iterations
 		text_blocks = bitstring.nsplit(self.text, 8)  # Split the text in blocks of 8 bytes so 64 bits
 		result = list()
 		for block in text_blocks:  # Loop over all the blocks of data
@@ -197,12 +197,14 @@ class des():
 		return g[n:] + g[:n], d[n:] + d[:n]
 
 	def addPadding(self):  # Add padding to the datas using PKCS5 spec.
-		pad_len = 8 - (len(self.text) % 8)
-		self.text += pad_len * chr(pad_len)
+		self.pad_len = 8 - (len(self.text) % 8)
+		self.text += self.pad_len * '\0'
+
+	# self.text += pad_len * chr(pad_len)
 
 	def removePadding(self, data):  # Remove the padding of the plain text (it assume there is padding)
-		pad_len = ord(data[-1])
-		return data[:-pad_len]
+		# pad_len = ord(data[-1])
+		return data[:-self.pad_len]
 
 	def encrypt(self, key, text, padding=False):
 		return self.run(key, text, ENCRYPT, padding)
@@ -217,5 +219,6 @@ if __name__ == '__main__':
 	d = des()
 	r = d.encrypt(key, text, True)
 	r2 = d.decrypt(key, r, True)
-	print("Ciphered: %r" % r)
-	print("Deciphered: ", r2)
+	print("Key       : %r" % key)
+	print("Ciphered  : %r" % r)
+	print("Deciphered: %r" % r2)
