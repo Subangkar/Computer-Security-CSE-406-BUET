@@ -1,4 +1,4 @@
-import bitstring
+import bitutils
 
 # -*- coding: utf8 -*-
 
@@ -137,12 +137,12 @@ class des():
 			raise "Data size should be multiple of 8"
 
 		self.generatekeys()  # Generate all the keys for 16 iterations
-		text_blocks = bitstring.nsplit(self.text, 8)  # Split the text in blocks of 8 bytes so 64 bits
+		text_blocks = bitutils.nsplit(self.text, 8)  # Split the text in blocks of 8 bytes so 64 bits
 		result = list()
 		for block in text_blocks:  # Loop over all the blocks of data
-			block = bitstring.string_to_bit_array(block)  # Convert the block in bit array
+			block = bitutils.string_to_bit_array(block)  # Convert the block in bit array
 			block = self.permut(block, PI)  # Apply the initial permutation
-			g, d = bitstring.nsplit(block, 32)  # g(LEFT), d(RIGHT)
+			g, d = bitutils.nsplit(block, 32)  # g(LEFT), d(RIGHT)
 			tmp = None
 			for i in range(16):  # Do the 16 rounds
 				d_e = self.expand(d, E)  # Expand d to match Ki size (48bits)
@@ -156,21 +156,21 @@ class des():
 				g = d
 				d = tmp
 			result += self.permut(d + g, PI_1)  # Do the last permut and append the result to result
-		final_res = bitstring.bit_array_to_string(result)
+		final_res = bitutils.bit_array_to_string(result)
 		if padding and action == DECRYPT:
 			return self.removePadding(final_res)  # Remove the padding if decrypt and padding is true
 		else:
 			return final_res  # Return the final string of data ciphered/deciphered
 
 	def substitute(self, d_e):  # Substitute bytes using SBOX
-		subblocks = bitstring.nsplit(d_e, 6)  # Split bit array into sublist of 6 bits
+		subblocks = bitutils.nsplit(d_e, 6)  # Split bit array into sublist of 6 bits
 		result = list()
 		for i in range(len(subblocks)):  # For all the sublists
 			block = subblocks[i]
 			row = int(str(block[0]) + str(block[5]), 2)  # Get the row with the first and last bit
 			column = int(''.join([str(x) for x in block[1:][:-1]]), 2)  # Column is the 2,3,4,5th bits
 			val = S_BOX[i][row][column]  # Take the value in the SBOX appropriated for the round (i)
-			bin = bitstring.binvalue(val, 4)  # Convert the value to binary
+			bin = bitutils.binvalue(val, 4)  # Convert the value to binary
 			result += [int(x) for x in bin]  # And append it to the resulting list
 		return result
 
@@ -185,9 +185,9 @@ class des():
 
 	def generatekeys(self):  # Algorithm that generates all the keys
 		self.keys = []
-		key = bitstring.string_to_bit_array(self.password)
+		key = bitutils.string_to_bit_array(self.password)
 		key = self.permut(key, CP_1)  # Apply the initial permut on the key
-		g, d = bitstring.nsplit(key, 28)  # Split it in to (g->LEFT),(d->RIGHT)
+		g, d = bitutils.nsplit(key, 28)  # Split it in to (g->LEFT),(d->RIGHT)
 		for i in range(16):  # Apply the 16 rounds
 			g, d = self.shift(g, d, SHIFT[i])  # Apply the shift associated with the round (not always 1)
 			tmp = g + d  # Merge them

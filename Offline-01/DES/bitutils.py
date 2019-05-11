@@ -1,4 +1,3 @@
-
 def string_to_bit_array(text):  # Convert a string into a list of bits
 	array = list()
 	for char in text:
@@ -14,8 +13,6 @@ def bit_array_to_string(array):  # Recreate the string from the bit array
 
 def binvalue(val, bitsize):  # Return the binary value as a string of the given size
 	binval = bin(val)[2:] if isinstance(val, int) else bin(ord(val))[2:]
-	if len(binval) > bitsize:
-		raise "binary value larger than the expected size"
 	while len(binval) < bitsize:
 		binval = "0" + binval  # Add as many 0 as needed to get the wanted size
 	return binval
@@ -23,3 +20,7 @@ def binvalue(val, bitsize):  # Return the binary value as a string of the given 
 
 def nsplit(s, n):  # Split a list into sublists of size "n"
 	return [s[k:k + n] for k in range(0, len(s), n)]
+
+
+def xor(t1, t2):  # Apply a xor and return the resulting list
+	return [x ^ y for x, y in zip(t1, t2)]
