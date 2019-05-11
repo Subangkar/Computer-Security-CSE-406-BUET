@@ -2,7 +2,7 @@ import secondMostChar
 import re
 
 # ------------------ Data --------------------
-orig_value = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+cipher_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 # ------------------ INPUT --------------------
 cipher_text = "THQVHAQCYCSPMAWARNTLNRTAVQUOEQWWNPQRTZQEYAWARTHQTENARTHQTENARKALLONWWMFINOQWTNTCAXQINKRVEQNTQTHQNXNLNRVHQKHQRTHQTENARLQNXQWTHQWTNTAYR "
@@ -38,9 +38,9 @@ freq_pattern_custom = {
 }
 
 # ------------------ Map & Update --------------------
-key_map = dict()
-for char in orig_value:
-	key_map[char] = '\0'
+cipher_to_plain_map = dict()
+for char in cipher_chars:
+	cipher_to_plain_map[char] = '\0'
 
 
 def updateMap(cipher, clear, key):
@@ -63,12 +63,12 @@ def updatedClearTextWithMap(clear, key):
 
 
 def printkey(key):
-	for c in orig_value:
+	for c in cipher_chars:
 		print(c, end=" ")
 	print()
 
 	count = 0
-	for c in orig_value:
+	for c in cipher_chars:
 		if key[c] != '\0':
 			print(key[c], end=" ")
 		else:
@@ -86,8 +86,8 @@ for i in range(freq_chars.__len__()):
 	# print(freq_chars[i], end=' > ')
 	# print(freq_count_list[-i - 1][0], end=' ')
 	# print(freq_count_list[-i - 1][1], end='\n')
-	key_map[freq_count_list[-i - 1][0]] = freq_chars[i]
-	clear_text = clear_text.replace(freq_count_list[-i - 1][0], key_map[freq_count_list[-i - 1][0]])
+	cipher_to_plain_map[freq_count_list[-i - 1][0]] = freq_chars[i]
+	clear_text = clear_text.replace(freq_count_list[-i - 1][0], cipher_to_plain_map[freq_count_list[-i - 1][0]])
 
 print(clear_text)  # frequent Replaced
 
@@ -97,13 +97,13 @@ print(clear_text)  # frequent Replaced
 for i in range(freq_words.__len__()):
 	s = re.sub(freq_pattern[freq_words[i]], freq_words[i], clear_text)
 	print(s)  # frequent Replaced
-	updateMap(clear_text, s, key_map)
-	clear_text = updatedClearTextWithMap(clear_text, key_map)
+	updateMap(clear_text, s, cipher_to_plain_map)
+	clear_text = updatedClearTextWithMap(clear_text, cipher_to_plain_map)
 	print(clear_text)  # word 1 replaced
 
 print("\n --------- From Provided Words Only ---------- ")
 print("Key: ")
-printkey(key_map)
+printkey(cipher_to_plain_map)
 print("Cipher: " + cipher_text)
 print("Clear : " + clear_text)
 
@@ -113,13 +113,13 @@ print("Clear : " + clear_text)
 for i in range(freq_words_custom.__len__()):
 	s = re.sub(freq_pattern_custom[freq_words_custom[i]], freq_words_custom[i], clear_text)
 	print(s)  # frequent Replaced
-	updateMap(clear_text, s, key_map)
-	clear_text = updatedClearTextWithMap(clear_text, key_map)
+	updateMap(clear_text, s, cipher_to_plain_map)
+	clear_text = updatedClearTextWithMap(clear_text, cipher_to_plain_map)
 	print(clear_text)  # word 1 replaced
 
 print("\n --------- From Visible Intuition ---------- ")
 print("Key: ")
-printkey(key_map)
+printkey(cipher_to_plain_map)
 print("Cipher: " + cipher_text)
 print("Clear : " + clear_text)
 

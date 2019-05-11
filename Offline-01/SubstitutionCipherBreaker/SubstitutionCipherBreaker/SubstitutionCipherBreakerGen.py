@@ -4,31 +4,20 @@ import secondMostChar
 import re
 
 # ------------------ Data --------------------
-orig_value = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+cipher_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+plain_chars = 'abcdefghijklmnopqrstuvwxyz'
 
 cipher_text = ''
 freq_chars_str = ''
 freq_words_str = ''
 
-# freq_chars = ['e', 't', 'a']
 freq_chars = []
 
-# freq_words = ['atlantic', 'express', 'avalanche', 'station']
 freq_words = []
-
-# freq_words_custom = [
-# 	'and'
-# 	# ,'ing'
-# 	, 'will'
-# 	, 'of'
-# 	# ,'be'
-# 	# ,'by'
-# 	, 'passby'
-# 	, 'dawn'
-# ]
 freq_words_custom = []
 
-key_map = dict()
+cipher_to_plain_map = dict()
+plain_to_cipher_map = dict()
 key_found_list = dict()
 
 
@@ -63,24 +52,34 @@ def fileinput():
 # ------------------ Map & Update --------------------
 
 def initmap():
-	global key_map, key_found_list, orig_value
+	global cipher_to_plain_map, key_found_list, cipher_chars
 	for i in range(26):
 		key_found_list[str(chr(i + ord('a')))] = False
-	for char in orig_value:
-		key_map[char] = '\0'
+	for char in cipher_chars:
+		cipher_to_plain_map[char] = '\0'
+	for char in plain_chars:
+		plain_to_cipher_map[char] = '\0'
+
+
+def addmapping(decoded_char, encoded_char):
+	global cipher_to_plain_map, plain_to_cipher_map, key_found_list
+	cipher_to_plain_map[encoded_char] = decoded_char
+	plain_to_cipher_map[decoded_char] = encoded_char
+	key_found_list[decoded_char] = True
 
 
 def updateMap(cipher, clear, key, key_found):
 	for i in range(cipher.__len__()):
 		if cipher[i] != clear[i] and clear[i].islower():
 			if cipher[i].isupper() and clear[i].islower() and key[cipher[i]] == '\0':
-				key[cipher[i]] = clear[i]
-				key_found[clear[i]] = True
-	# else:
-	# 	print("redundant > ", end=" ")
-	# 	print("cipher=" + cipher[i], end=" ")
-	# 	print("clear=" + clear[i], end=" ")
-	# 	print("key=" + key[cipher[i]], end="\n")
+				addmapping(clear[i], cipher[i])
+
+
+# else:
+# 	print("redundant > ", end=" ")
+# 	print("cipher=" + cipher[i], end=" ")
+# 	print("clear=" + clear[i], end=" ")
+# 	print("key=" + key[cipher[i]], end="\n")
 
 
 def updatedClearTextWithMap(clear, key):
@@ -90,19 +89,19 @@ def updatedClearTextWithMap(clear, key):
 	return clear
 
 
-def printkey(key):
-	global orig_value
-	for c in orig_value:
+def printmapping(charset, key):
+	for c in charset:
 		print(c, end=" ")
 	print()
 
 	count = 0
-	for c in orig_value:
+	for c in charset:
 		if key[c] != '\0':
 			print(key[c], end=" ")
 		else:
 			count += 1
 			print(' ', end=" ")
+
 	print("\n" + str(count) + ' Undetected')
 
 
@@ -116,18 +115,27 @@ def string_to_regex(word, key_found_list):
 	return regex
 
 
+def encode(text, key):
+	encoded = ""
+	for c in text:
+		if c in key:
+			encoded += key[c]
+		else:
+			encoded += c
+	return encoded
+
+
 # ------------------ Most Freq Chars Replacement --------------------
 def replacefreqletters():
-	global key_map, key_found_list, clear_text, cipher_text, freq_words, freq_chars
+	global cipher_to_plain_map, key_found_list, clear_text, cipher_text, freq_words, freq_chars
 
 	# print(clear_text)  # Cipher
 
 	freq_count_list = (secondMostChar.char_count(cipher_text))
 
 	for i in range(freq_chars.__len__()):
-		key_map[freq_count_list[-i - 1][0]] = freq_chars[i]
-		key_found_list[freq_chars[i]] = True
-		clear_text = clear_text.replace(freq_count_list[-i - 1][0], key_map[freq_count_list[-i - 1][0]])
+		addmapping(freq_chars[i], freq_count_list[-i - 1][0])
+		clear_text = clear_text.replace(freq_count_list[-i - 1][0], cipher_to_plain_map[freq_count_list[-i - 1][0]])
 
 
 # print(clear_text)  # frequent Replaced
@@ -135,7 +143,7 @@ def replacefreqletters():
 # ------------------ Word Replacement Provided --------------------
 
 def replaceprovidedwords():
-	global key_map, key_found_list, clear_text, cipher_text, freq_words, freq_chars
+	global cipher_to_plain_map, key_found_list, clear_text, cipher_text, freq_words, freq_chars
 
 	# print(freq_pattern[freq_words[0]])
 	for i in range(freq_words.__len__()):
@@ -143,20 +151,21 @@ def replaceprovidedwords():
 		print(string_to_regex(freq_words[i], key_found_list))
 		s = re.sub(string_to_regex(freq_words[i], key_found_list), freq_words[i], clear_text)
 		# print(s)  # frequent Replaced
-		updateMap(clear_text, s, key_map, key_found_list)
-		clear_text = updatedClearTextWithMap(clear_text, key_map)
+		updateMap(clear_text, s, cipher_to_plain_map, key_found_list)
+		clear_text = updatedClearTextWithMap(clear_text, cipher_to_plain_map)
 	# print(clear_text)  # word 1 replaced
 
 	print("\n --------- From Provided Words Only ---------- ")
 	print("Key: ")
-	printkey(key_map)
+	printmapping(cipher_chars, cipher_to_plain_map)
 	print("Cipher: " + cipher_text)
 	print("Clear : " + clear_text)
+	print("Cipher: " + encode(clear_text, plain_to_cipher_map))
 
 
 # ------------------ Word Replacement Custom --------------------
 def replacecustomwords():
-	global key_map, key_found_list, clear_text, cipher_text, freq_words, freq_chars
+	global cipher_to_plain_map, key_found_list, clear_text, cipher_text, freq_words, freq_chars
 
 	if len(freq_words_custom) == 0:
 		return
@@ -167,15 +176,16 @@ def replacecustomwords():
 		print(string_to_regex(freq_words_custom[i], key_found_list))
 		s = re.sub(string_to_regex(freq_words_custom[i], key_found_list), freq_words_custom[i], clear_text)
 		# print(s)  # frequent Replaced
-		updateMap(clear_text, s, key_map, key_found_list)
-		clear_text = updatedClearTextWithMap(clear_text, key_map)
+		updateMap(clear_text, s, cipher_to_plain_map, key_found_list)
+		clear_text = updatedClearTextWithMap(clear_text, cipher_to_plain_map)
 	# print(clear_text)  # word 1 replaced
 
 	print("\n --------- From Visible Intuition ---------- ")
 	print("Key: ")
-	printkey(key_map)
+	printmapping(cipher_chars, cipher_to_plain_map)
 	print("Cipher: " + cipher_text)
 	print("Clear : " + clear_text)
+	print("Cipher: " + encode(clear_text, plain_to_cipher_map))
 
 
 if __name__ == '__main__':
@@ -185,3 +195,7 @@ if __name__ == '__main__':
 	replacefreqletters()
 	replaceprovidedwords()
 	replacecustomwords()
+	print("Cipher to Plain:")
+	printmapping(cipher_chars, cipher_to_plain_map)
+	print("Plain to Cipher:")
+	printmapping(plain_chars, plain_to_cipher_map)
