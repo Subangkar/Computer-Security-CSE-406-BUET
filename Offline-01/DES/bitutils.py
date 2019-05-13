@@ -17,9 +17,8 @@ def nsplit(s, n):  # sub-lists are of size "n"
 
 def binvalue(val, bitsize):  # Return the binary value as a string of the given size
 	binval = bin(val)[2:] if isinstance(val, int) else bin(ord(val))[2:]
-	while len(binval) < bitsize:
-		binval = "0" + binval
-	return binval
+	# bin is given as 0b0110...
+	return "0"*(bitsize-len(binval)) + binval
 
 
 def xor(t1, t2):
