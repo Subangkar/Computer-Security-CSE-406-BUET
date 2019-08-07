@@ -441,3 +441,4 @@ dmypy.json
 .history
 
 # End of https://www.gitignore.io/api/c,c++,clion,python,pycharm,clion+iml,pycharm+iml,visualstudiocode
+**/\.idea/
