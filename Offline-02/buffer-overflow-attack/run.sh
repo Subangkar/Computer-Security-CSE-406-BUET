@@ -8,4 +8,7 @@ cp compile.sh demo.c exploit.py "$directory"
 cd "$directory"
 compile.sh demo.c
 exploit.py
+whoami
+#cd -
+#"${directory}demo"
 ./demo
