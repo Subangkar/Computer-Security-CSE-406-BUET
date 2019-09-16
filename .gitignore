@@ -441,3 +441,8 @@ dmypy.json
 .history
 
 # End of https://www.gitignore.io/api/c,c++,clion,python,pycharm,clion+iml,pycharm+iml,visualstudiocode
+Offline-01/SubstitutionCipherBreaker/\.vs/SubstitutionCipherBreaker/v16/\.suo
+
+Offline-01/SubstitutionCipherBreaker/SubstitutionCipherBreaker/\.idea/
+
+Offline-01/DES/\.idea/
