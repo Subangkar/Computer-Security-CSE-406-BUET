@@ -448,3 +448,7 @@ Offline-01/SubstitutionCipherBreaker/SubstitutionCipherBreaker/\.idea/
 Offline-01/DES/\.idea/
 
 **/\.idea/
+
+**/\.vscode/
+
+Ping-Spoofing/raw-ping/\.idea/
